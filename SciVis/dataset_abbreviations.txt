@@ -1,0 +1,29 @@
+BI (Burning Index): A measure of fire potential based on weather conditions and fuel moisture.
+
+ERC (Energy Release Component): Indicates potential energy released during combustion; used to assess fire danger.
+
+ETR (Evapotranspiration): Total water transferred from land to atmosphere through evaporation and plant transpiration.
+
+FM100 (Fine Fuel Moisture - 100-hour): Moisture content in fine fuels (like grass) that has been cured for about 100 hours; affects fire behavior.
+
+FM1000 (Fine Fuel Moisture - 1000-hour): Moisture content in larger fuels (like logs) that have been cured for about 1000 hours; influences fire spread.
+
+PET (Potential Evapotranspiration): Maximum possible evapotranspiration based on temperature and solar radiation; indicates water demand.
+
+PR (Precipitation): Amount of rainfall or snowfall; important for water balance and ecosystem health.
+
+Rmax (Maximum Relative Humidity): Highest relative humidity recorded; affects evaporation and weather patterns.
+
+Rmin (Minimum Relative Humidity): Lowest relative humidity recorded; critical for understanding moisture levels in the air.
+
+SPH (Specific Humidity): Measure of the amount of water vapor present in the air, expressed as a ratio of the mass of water vapor to the total mass of air.
+
+SRAD (Solar Radiation): Amount of solar energy received; influences temperature and photosynthesis.
+
+TH (Temperature - Humidity): Often refers to temperature adjusted for humidity effects; important in understanding comfort levels.
+
+TMMX (Maximum Temperature): Highest air temperature recorded over a period; affects plant and animal behavior.
+
+VPD (Vapor Pressure Deficit): Difference between the amount of moisture in the air and the amount the air can hold at saturation; influences plant water stress.
+
+VS (Wind Speed): Speed of the wind; affects weather patterns, evaporation rates, and fire behavior.

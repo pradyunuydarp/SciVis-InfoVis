@@ -1,0 +1,100 @@
+<html>
+
+<head>
+    <title>COVID-19 Cases Treemap</title>
+    <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script type="text/javascript">
+        FusionCharts.ready(async function () {
+            let chartData = [];
+
+
+            async function parseCSV() {
+                const response = await fetch('non-hierarchical_data.csv');
+                const csvData = await response.text();
+
+                return new Promise((resolve) => {
+                    Papa.parse(csvData, {
+                        header: true,
+                        complete: (results) => {
+                            const parsedData = results.data;
+
+
+                            const worldNode = { label: "World", data: [] };
+
+                            // Process data into a hierarchical structure
+                            parsedData.forEach(row => {
+                                const country = row['country_name'];
+                                const monthlyCases = parseFloat(row['Nov2021']) || 0;
+
+
+                                const countryNode = { label: country, value: monthlyCases, sValue: monthlyCases };
+
+
+                                worldNode.data.push(countryNode);
+                            });
+
+
+                            chartData = [worldNode];
+                            resolve(chartData);
+                        }
+                    });
+                });
+            }
+
+
+            chartData = await parseCSV();
+            console.log('chartData', chartData);
+
+
+            var chartObj = new FusionCharts({
+                type: 'treemap',
+                renderAt: 'chart-container',
+                width: '1720',
+                height: '1080',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "plotfillalpha": "80",
+                        "animation": "0",
+                        "hideTitle": "1",
+                        "algorithm": "sliceanddice",   // Squarified algorithm or sliceanddice
+                        "slicingmode": "alternate",     // Set the orientation to vertical, horizontal or alternate for sliceanddice
+                        "plotToolText": "<div><b>$label</b><br/> <b>Cases: </b>$value<br/></div>",
+                        "horizontalPadding": "0.5",
+                        "verticalPadding": "0.5",
+                        "showChildLabels": "1",
+                        "plotbordercolor": "666666",
+                        "theme": "fusion"
+                    },
+                    "data": chartData,
+                    "colorrange": {
+                        "mapbypercent": "0",
+                        "gradient": "1",
+                        "minvalue": "0",
+                        "code": "efb00d",
+                        "color": [
+                            { "code": "f1c125", "maxvalue": "500000" },
+                            { "code": "e38515", "maxvalue": "1000000" },
+                            { "code": "a73e4f", "maxvalue": "5000000" },
+                            { "code": "8e4266", "maxvalue": "15000000" },
+                            { "code": "58326f", "maxvalue": "40000000" },
+                            { "code": "1c1d53", "maxvalue": "48560466" }
+                        ]
+                    }
+
+                }
+            });
+
+            chartObj.render();
+        });
+    </script>
+</head>
+
+<body>
+    <div id="chart-container">FusionCharts XT will load here!</div>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+netCDF4
+numpy
+matplotlib
+pandas
+xarray
+imageio
+cartopy
+Pillow

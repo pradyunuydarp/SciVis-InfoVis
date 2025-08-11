@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Interactive Monthly Cases per Country</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 0;
+        }
+        #plot-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        #plot {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh; /* Adjust height to fit the screen better */
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive Monthly Cases per Country</h1>
+    <div id="plot-container">
+        <div id="plot"></div>
+    </div>
+
+    <footer>
+        Data Source: COVID-19 Monthly Cases | Powered by Plotly.js
+    </footer>
+
+    <script>
+        var countries = [ 'Germany', 'Turkey', 'Argentina', 'Italy', 'Indonesia',
+                         'Iran', 'Poland', 'Colombia', 'Malaysia', 'South Africa', 'Peru',
+                         'Ukraine', 'Mexico', 'Canada', 'Romania', 'Netherlands', 'Chile',
+                         'Czech Republic', 'Pakistan'];
+
+        // Generate random colors for each country
+        function generateRandomColors(n) {
+            var colors = [];
+            for(var i = 0; i < n; i++) {
+                var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                while(color.length < 7) {
+                    color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                }
+                colors.push(color);
+            }
+            return colors;
+        }
+
+        var randomColors = generateRandomColors(countries.length);
+
+        // Create legend entries
+        var legendEntries = countries.map((country, i) => ({
+            type: 'scatter',
+            x: [null],
+            y: [null],
+            name: country,
+            line: {color: randomColors[i]},
+            showlegend: true,
+            hoverinfo: 'skip'
+        }));
+
+        var mainPlot = {
+            type: 'parcoords',
+            line: {
+                color: Array.from({length: countries.length}, (_, i) => i),
+                colorscale: randomColors.map((color, i) => [i / (countries.length - 1), color])
+            },
+            dimensions: [
+            {'label': '2020-03', 'values': [ 5923564.0, 318663.0, 2348821.0, 3584899.0, 4215104.0, 2499077.0, 2792142.0, 2841934.0, 2471642.0, 5647.0, 1548807.0, 1725029.0, 924962.0, 989493.0, 2245.0, 1272616.0, 1615771.0, 984774.0, 825519.0]},
+            {'label': '2020-04', 'values': [ 6200937.0, 375367.0, 2977363.0, 4022653.0, 4244358.0, 2913136.0, 2872283.0, 29383.0, 2481339.0, 32683.0, 1799445.0, 2124070.0, 1113543.0, 1229305.0, 12240.0, 1496352.0, 1637234.0, 1235480.0, 922824.0]},
+            {'label': '2020-05', 'values': [ 2225659.0, 638847.0, 3781784.0, 4217821.0, 4256409.0, 304204.0, 362731.0, 97846.0, 113010.0, 1973972.0, 1955469.0, 2160809.0, 1426094.0, 1389814.0, 15362.0, 1649460.0, 462991.0, 1532332.0, 958408.0]},
+            {'label': '2020-06', 'values': [ 2450295.0, 2208652.0, 4470374.0, 4771965.0, 4257815.0, 375212.0, 990811.0, 295508.0, 214959.0, 2377823.0, 2052065.0, 37361.0, 1864260.0, 1423170.0, 1098765.0, 796981.0, 510256.0, 1580189.0, 825519.0]},
+            {'label': '2020-07', 'values': [ 2843644.0, 2477463.0, 4929764.0, 5028547.0, 1078314.0, 404648.0, 1294878.0, 615094.0, 300752.0, 1057161.0, 2111393.0, 124132.0, 1936013.0, 1810825.0, 1233668.0, 978475.0, 551743.0, 1580189.0, 922824.0]},
+            {'label': '2020-08', 'values': [ 3405365.0, 2586183.0, 5185620.0, 5164780.0, 1334634.0, 962070.0, 1513385.0, 829679.0, 324971.0, 1246643.0, 2149591.0, 214446.0, 1936013.0, 783735.0, 1648031.0, 1088690.0, 608973.0, 1580189.0, 958408.0]},
+            {'label': '2020-09', 'values': [ 3689921.0, 3317182.0, 5256902.0, 2553032.0, 1511712.0, 1225142.0, 1706986.0, 1074184.0, 408713.0, 1973972.0, 2175305.0, 399330.0, 1936013.0, 871243.0, 1764251.0, 1272616.0, 727109.0, 1580189.0, 1029811.0]},
+            {'label': '2020-10', 'values': [ 3736205.0, 4820591.0, 5266275.0, 2925265.0, 1668368.0, 1417999.0, 2321717.0, 1316806.0, 572357.0, 2377823.0, 2190009.0, 752343.0, 1936013.0, 989493.0, 1764251.0, 1496352.0, 824625.0, 1580189.0, 1163688.0]},
+            {'label': '2020-11', 'values': [ 3776724.0, 5249404.0, 1424533.0, 3584899.0, 1821703.0, 1631169.0, 2792142.0, 1642775.0, 622086.0, 2377823.0, 962530.0, 970758.0, 1936013.0, 1229305.0, 1764251.0, 1649460.0, 995538.0, 1580189.0, 1221261.0]},
+            {'label': '2020-12', 'values': [ 3779797.0, 5425652.0, 1625514.0, 4022653.0, 2178272.0, 1885564.0, 2872283.0, 2094884.0, 1113272.0, 2377823.0, 995899.0, 1395528.0, 1936013.0, 1389814.0, 1764251.0, 1680228.0, 1198245.0, 1580189.0, 1221261.0]},
+            {'label': '2021-01', 'values': [ 5923564.0, 5727045.0, 1927239.0, 4217821.0, 3409658.0, 2499077.0, 2879470.0, 2251690.0, 1489460.0, 2377823.0, 1138239.0, 1725029.0, 1936013.0, 1423170.0, 1764251.0, 1680228.0, 1384346.0, 1580189.0, 1221261.0]},
+            {'label': '2021-02', 'values': [ 6200937.0, 5996194.0, 2107365.0, 4259909.0, 4089801.0, 2913136.0, 2879470.0, 2406377.0, 2245695.0, 2377823.0, 1323863.0, 2124070.0, 1936013.0, 1438457.0, 1764251.0, 1680228.0, 1555902.0, 1580189.0, 1221261.0]},
+            {'label': '2021-03', 'values': [ 6200937.0, 5996194.0, 2348821.0, 4302393.0, 4215104.0, 3192809.0, 2879470.0, 2841934.0, 2471642.0, 2377823.0, 1548807.0, 2160809.0, 1936013.0, 1507092.0, 1764251.0, 1680228.0, 1615771.0, 1580189.0, 1221261.0]},
+            {'label': '2021-04', 'values': [ 6200937.0, 5996194.0, 2977363.0, 4771965.0, 4244358.0, 3192809.0, 2879470.0, 2841934.0, 2481339.0, 2377823.0, 1799445.0, 2160809.0, 1936013.0, 1537294.0, 1764251.0, 1680228.0, 1637234.0, 1580189.0, 1221261.0]},
+            {'label': '2021-05', 'values': [ 6200937.0, 5996194.0, 3781784.0, 5028547.0, 4256409.0, 3192809.0, 2879470.0, 2841934.0, 2481339.0, 2377823.0, 1955469.0, 2160809.0, 1936013.0, 1763.0, 1764251.0, 1680228.0, 1637234.0, 1580189.0, 1221261.0]},
+            {'label': '2021-06', 'values': [ 6200937.0, 5996194.0, 4470374.0, 5164780.0, 4257815.0, 3192809.0, 2879470.0, 2841934.0, 2481339.0, 2377823.0, 2052065.0, 2160809.0, 1936013.0, 1800867.0, 1764251.0, 1680228.0, 1637234.0, 1580189.0, 1221261.0]},
+            ],
+            hoveron: 'lines',
+            text: countries,
+            hoverinfo: 'text',
+            hoverlabel: {
+                bgcolor: '#000',
+                font: { size: 16 }
+            }
+        };
+
+        var layout = {
+            title: 'Interactive Monthly Cases at End of Month per Country',
+            width: 1200,
+            height: 700,
+            paper_bgcolor: '#fff',
+            plot_bgcolor: '#fff',
+            showlegend: true,
+            legend: {
+                orientation: 'h',
+                y: -0.2
+            },
+            xaxis: {
+                showgrid: false,
+                zeroline: false,
+                visible: false
+            },
+            yaxis: {
+                showgrid: false,
+                zeroline: false,
+                visible: false
+            }
+        };
+
+        var config = {
+            displayModeBar: true,
+            responsive: true
+        };
+
+        // Combine the main plot with legend entries
+        var data = [mainPlot, ...legendEntries];
+
+        Plotly.newPlot('plot', data, layout, config);
+    </script>
+</body>
+</html>

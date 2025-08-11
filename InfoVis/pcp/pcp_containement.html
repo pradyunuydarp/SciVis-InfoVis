@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C1 School Closing Line Plot with Brushing</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+
+<div id="line-plot" style="width:100%;height:600px;"></div>
+
+<script>
+    // Load CSV data
+    d3.csv('./Containment_Policy_Cleaned.csv').then(function(data) {
+
+        // Print the data to the console
+        console.log(data);
+
+        // Extract unique countries
+        const countries = [...new Set(data.map(d => d.CountryName))];
+
+        // Extract unique months for the x-axis
+        const months = [...new Set(data.map(d => d.Month_Year))];
+
+        // Create traces for each country, using lines and markers to allow selection
+        const traces = countries.map(country => {
+            return {
+                x: data.filter(d => d.CountryName === country).map(d => d.Month_Year), // Month-Year on the x-axis
+                y: data.filter(d => d.CountryName === country).map(d => +d['C1_School closing']), // C1 values on the y-axis
+                mode: 'lines+markers', // Lines with markers for selection
+                marker: { size: 6 },
+                name: country // Country name as the label
+            };
+        });
+
+        // Layout for the Line Plot
+        const layout = {
+            title: 'C1 School Closing Over Time',
+            xaxis: { title: 'Month-Year', tickvals: months }, // Set the x-axis to display months
+            yaxis: { title: 'C1 School Closing' },
+            width: 1500,
+            height: 600,
+            dragmode: 'select', // Enable select mode for brushing
+            showlegend: true
+        };
+
+        // Initial plot rendering
+        Plotly.newPlot('line-plot', traces, layout);
+
+        // Add event listener for selection (brushing)
+        var myPlot = document.getElementById('line-plot');
+
+        myPlot.on('plotly_selected', function(eventData) {
+            if (eventData) {
+                // Get the indices of selected traces (corresponding to countries)
+                const selectedCountries = new Set(eventData.points.map(pt => pt.curveNumber));
+
+                // Filter and update the traces based on selected countries
+                const filteredTraces = traces.map((trace, index) => ({
+                    ...trace,
+                    visible: selectedCountries.has(index) ? true : 'legendonly'
+                }));
+
+                // Update the plot with the selected countries
+                Plotly.react('line-plot', filteredTraces, layout);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

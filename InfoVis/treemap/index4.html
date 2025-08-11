@@ -1,0 +1,178 @@
+<html>
+
+<head>
+    <title>COVID-19 Cases Treemap</title>
+    <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script type="text/javascript">
+        FusionCharts.ready(async function () {
+
+            let chartData = [];
+
+            // Region code to name mapping
+            const regionNames = {
+                "US_AK": "Alaska", "US_AL": "Alabama", "US_AR": "Arkansas",
+                "US_AZ": "Arizona", "US_CA": "California", "US_CO": "Colorado",
+                "US_CT": "Connecticut", "US_DC": "District of Columbia",
+                "US_DE": "Delaware", "US_FL": "Florida", "US_GA": "Georgia",
+                "US_HI": "Hawaii", "US_IA": "Iowa", "US_ID": "Idaho",
+                "US_IL": "Illinois", "US_IN": "Indiana", "US_KS": "Kansas",
+                "US_KY": "Kentucky", "US_LA": "Louisiana", "US_MA": "Massachusetts",
+                "US_MD": "Maryland", "US_ME": "Maine", "US_MI": "Michigan",
+                "US_MN": "Minnesota", "US_MO": "Missouri", "US_MS": "Mississippi",
+                "US_MT": "Montana", "US_NC": "North Carolina", "US_ND": "North Dakota",
+                "US_NE": "Nebraska", "US_NH": "New Hampshire", "US_NJ": "New Jersey",
+                "US_NM": "New Mexico", "US_NV": "Nevada", "US_NY": "New York",
+                "US_OH": "Ohio", "US_OK": "Oklahoma", "US_OR": "Oregon",
+                "US_PA": "Pennsylvania", "US_RI": "Rhode Island",
+                "US_SC": "South Carolina", "US_SD": "South Dakota",
+                "US_TN": "Tennessee", "US_TX": "Texas", "US_UT": "Utah",
+                "US_VA": "Virginia", "US_VT": "Vermont", "US_WA": "Washington",
+                "US_WI": "Wisconsin", "US_WV": "West Virginia", "US_WY": "Wyoming"
+            };
+
+
+            async function parseCSV() {
+                const response = await fetch('hierarchical_data.csv');
+                const csvData = await response.text();
+                return new Promise((resolve) => {
+                    Papa.parse(csvData, {
+                        header: true,
+                        complete: (results) => {
+                            const parsedData = results.data;
+                            const countryMap = {};
+
+                            // Process data into hierarchical structure
+                            parsedData.forEach(row => {
+                                const country = row['Country'];
+                                const regionCode = row['RegionCode'];
+                                const month = row['Month'];
+                                const monthlyCases = parseFloat(row['MonthlyCases']) || 0;
+
+                                // Map region code to region name
+                                const regionName = regionNames[regionCode] || regionCode;
+
+                                if (!countryMap[country]) {
+                                    countryMap[country] = { label: country, data: [] };
+                                }
+
+                                let region = countryMap[country].data.find(child => child.label === regionName);
+                                if (!region) {
+                                    region = { label: regionName, data: [] };
+                                    countryMap[country].data.push(region);
+                                }
+
+
+                                const date = new Date(month + "-01");
+                                const formattedMonth = date.toLocaleString('default', { month: 'short' }) + " " + date.getFullYear().toString().slice(-2);
+
+                                region.data.push({ label: formattedMonth, value: monthlyCases, sValue: monthlyCases });
+                            });
+
+
+                            chartData = Object.values(countryMap);
+                            resolve(chartData);
+                        }
+                    });
+                });
+            }
+
+
+            chartData = await parseCSV();
+
+            console.log('chartData', chartData);
+
+
+            var chartObj = new FusionCharts({
+                type: 'treemap',
+                renderAt: 'chart-container',
+                width: '1720',
+                height: '1080',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "plotfillalpha": "80",
+                        "animation": "0",
+                        "hideTitle": "1",
+                        "algorithm": "sliceanddice",    // Squarified algorithm or sliceanddice
+                        "slicingmode": "alternate",     // Set the orientation to vertical, horizontal or alternate for sliceanddice
+                        "plotToolText": "<div><b>$label</b><br/> <b>Cases: </b>$value<br/></div>",
+                        "horizontalPadding": "0.5",
+                        "verticalPadding": "0.5",
+                        "plotborderthickness": ".1",
+                        "plotbordercolor": "666666",
+                        "theme": "fusion",
+                        "labelFontSize": "10",
+                        "labelBorderThickness": "0"
+                    },
+                    "data": chartData,
+                    "colorrange": {
+                        "mapbypercent": "0",
+                        "gradient": "1",
+                        "minvalue": "0",
+                        "code": "efb00d",
+                        "color": [
+                            { "code": "f1c125", "maxvalue": "5000" },      // Minimum
+                            { "code": "e38515", "maxvalue": "25000" },     // Q1 (25th percentile)
+                            { "code": "c15a43", "maxvalue": "50000" },     // Median (50th percentile)
+                            { "code": "8e4266", "maxvalue": "100000" },    // Q3 (75th percentile)
+                            { "code": "58326f", "maxvalue": "200000" },    // Near-maximum
+                            { "code": "1c1d53", "maxvalue": "1127720" }    // Outliers/maximum cases
+                        ]
+                    }
+                }
+            });
+
+            chartObj.render();
+
+
+            chartObj.render();
+        });
+    </script>
+</head>
+
+<body>
+    <div id="chart-container">FusionCharts XT will load here!</div>
+
+
+    <div style="margin-top: 20px; text-align: center;">
+        <svg width="600" height="120">
+
+            <defs>
+                <linearGradient id="boxplotGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#f1c125;stop-opacity:1" />
+                    <stop offset="25%" style="stop-color:#e38515;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#c15a43;stop-opacity:1" />
+                    <stop offset="75%" style="stop-color:#8e4266;stop-opacity:1" />
+                    <stop offset="90%" style="stop-color:#58326f;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#1c1d53;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+
+
+            <rect x="50" y="10" width="500" height="20" fill="url(#boxplotGradient)" />
+
+
+            <line x1="50" y1="70" x2="50" y2="100" stroke="black" stroke-width="2" />
+
+            <rect x="125" y="50" width="75" height="50" fill="#e38515" />
+
+            <line x1="300" y1="50" x2="300" y2="100" stroke="black" stroke-width="2" />
+
+            <rect x="375" y="50" width="75" height="50" fill="#8e4266" />
+
+            <line x1="550" y1="70" x2="550" y2="100" stroke="black" stroke-width="2" />
+
+
+            <text x="50" y="115" font-size="12" text-anchor="middle">Min</text>
+            <text x="162" y="115" font-size="12" text-anchor="middle">Q1</text>
+            <text x="300" y="115" font-size="12" text-anchor="middle">Median</text>
+            <text x="412" y="115" font-size="12" text-anchor="middle">Q3</text>
+            <text x="550" y="115" font-size="12" text-anchor="middle">Max</text>
+        </svg>
+    </div>
+</body>
+
+</html>
